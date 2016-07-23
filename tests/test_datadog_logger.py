@@ -46,3 +46,30 @@ class TestDatadogLogger(unittest.TestCase):
 
         mock_dd.api.Event.create.assert_called_with(
             title="Some message", text=expected_text)
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_tags_from_constructor(self, mock_dd):
+        handler = DatadogLogHandler(tags=["some:tag"])
+
+        record = logging.makeLogRecord({
+            "msg": "Some message"
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message",
+            tags=["some:tag"])
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_mentions_from_constructor(self, mock_dd):
+        handler = DatadogLogHandler(mentions=["@mention-1", "@mention-2"])
+
+        record = logging.makeLogRecord({
+            "msg": "Some message"
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message\n\n@mention-1 @mention-2")
