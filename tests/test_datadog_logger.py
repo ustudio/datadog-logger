@@ -73,3 +73,78 @@ class TestDatadogLogger(unittest.TestCase):
 
         mock_dd.api.Event.create.assert_called_with(
             title="Some message", text="Some message\n\n@mention-1 @mention-2")
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_maps_debug_to_info(self, mock_dd):
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message",
+            "levelno": logging.DEBUG
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message",
+            alert_type="info")
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_maps_info_to_info(self, mock_dd):
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message",
+            "levelno": logging.INFO
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message",
+            alert_type="info")
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_maps_warning_to_warning(self, mock_dd):
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message",
+            "levelno": logging.WARNING
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message",
+            alert_type="warning")
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_maps_error_to_error(self, mock_dd):
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message",
+            "levelno": logging.ERROR
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message",
+            alert_type="error")
+
+    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    def test_includes_maps_critical_to_error(self, mock_dd):
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message",
+            "levelno": logging.CRITICAL
+        })
+
+        handler.emit(record)
+
+        mock_dd.api.Event.create.assert_called_with(
+            title="Some message", text="Some message",
+            alert_type="error")
