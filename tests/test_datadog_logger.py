@@ -2,7 +2,10 @@ from datadog_logger.handler import DatadogLogHandler
 from datadog_logger import log_error_events
 
 import logging
-import mock
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 import sys
 import traceback
 import unittest

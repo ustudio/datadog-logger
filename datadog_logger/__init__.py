@@ -1,4 +1,4 @@
-from handler import DatadogLogHandler
+from datadog_logger.handler import DatadogLogHandler
 import logging
 
 
