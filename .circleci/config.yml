@@ -1,0 +1,127 @@
+version: 2
+jobs:
+  test-py35:
+    docker:
+      - image: circleci/python:3.5
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-py35-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            mkdir -p test-reports
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-py35-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            nosetests --verbose --with-xunit --xunit-file=test-reports/nosetests.xml
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports-py35
+
+      - store_test_results:
+          path: test-reports
+
+  test-py27:
+    docker:
+      - image: circleci/python:2.7
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-py27-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: install dependencies
+          command: |
+            python -m virtualenv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            mkdir -p test-reports
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-py27-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv/bin/activate
+            nosetests --verbose --with-xunit --xunit-file=test-reports/nosetests.xml
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports-py27
+
+      - store_test_results:
+          path: test-reports
+
+  publish:
+    docker:
+      - image: circleci/python:3.5
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-publish-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install twine
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-publish-dependencies-
+
+      - run:
+          name: Publish to PyPI
+          command: |
+            . venv/bin/activate
+            ./publish_to_pypi.sh
+
+workflows:
+  version: 2
+  test-and-publish:
+    jobs:
+      - test-py27:
+          filters:
+            tags:
+              only: /.*/
+      - test-py35:
+          filters:
+            tags:
+              only: /.*/
+      - publish:
+          requires:
+            - test-py27
+            - test-py35
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*.*/
+            branches:
+              ignore: /.*/
+          context: org-global
