@@ -78,4 +78,4 @@ workflows:
               only: /^v[0-9]+(\.[0-9]+)*.*/
             branches:
               ignore: /.*/
-          context: org-global
+          context: datadog-logger-publisher
