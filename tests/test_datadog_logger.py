@@ -19,7 +19,7 @@ def make_exc_info(
 
 class TestDatadogLogger(TestCase):
     def tearDown(self) -> None:
-        super(TestDatadogLogger, self).tearDown()
+        super().tearDown()
 
         # This tries to clean up the root logger if it was configured
         # via log_error_events. Logger.handlers is an undocumented
@@ -32,8 +32,8 @@ class TestDatadogLogger(TestCase):
             if handler.__class__ is DatadogLogHandler:
                 root_logger.removeHandler(handler)
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_logs_to_datadog(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_logs_to_datadog(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         record = logging.makeLogRecord({
@@ -42,11 +42,10 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
-            title="Some message", text="Some message")
+        mock_event_class.create.assert_called_with(title="Some message", text="Some message")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_logs_formatted_message_as_text(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_logs_formatted_message_as_text(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         exc_info = make_exc_info()
@@ -61,11 +60,10 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
-            title="Some message", text=expected_text)
+        mock_event_class.create.assert_called_with(title="Some message", text=expected_text)
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_tags_from_constructor(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_tags_from_constructor(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler(tags=["some:tag"])
 
         record = logging.makeLogRecord({
@@ -74,12 +72,12 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message",
             tags=["some:tag"])
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_mentions_from_constructor(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_mentions_from_constructor(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler(mentions=["@mention-1", "@mention-2"])
 
         record = logging.makeLogRecord({
@@ -88,11 +86,11 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message\n\n@mention-1 @mention-2")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_maps_debug_to_info(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_maps_debug_to_info(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         record = logging.makeLogRecord({
@@ -102,12 +100,12 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message",
             alert_type="info")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_maps_info_to_info(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_maps_info_to_info(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         record = logging.makeLogRecord({
@@ -117,12 +115,12 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message",
             alert_type="info")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_maps_warning_to_warning(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_maps_warning_to_warning(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         record = logging.makeLogRecord({
@@ -132,12 +130,12 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message",
             alert_type="warning")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_maps_error_to_error(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_maps_error_to_error(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         record = logging.makeLogRecord({
@@ -147,12 +145,12 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message",
             alert_type="error")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
-    def test_includes_maps_critical_to_error(self, mock_dd: mock.Mock) -> None:
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_includes_maps_critical_to_error(self, mock_event_class: mock.Mock) -> None:
         handler = DatadogLogHandler()
 
         record = logging.makeLogRecord({
@@ -162,28 +160,28 @@ class TestDatadogLogger(TestCase):
 
         handler.emit(record)
 
-        mock_dd.api.Event.create.assert_called_with(
+        mock_event_class.create.assert_called_with(
             title="Some message", text="Some message",
             alert_type="error")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
     def test_log_error_registers_error_reporter_with_configuration(
         self,
-        mock_dd: mock.Mock
+        mock_event_class: mock.Mock
     ) -> None:
         log_error_events(tags=["some:tag"], mentions=["@mention"])
 
         logging.info("Should not be logged")
         logging.error("Should be logged")
 
-        mock_dd.api.Event.create.assert_called_once_with(
+        mock_event_class.create.assert_called_once_with(
             title="Should be logged", text="Should be logged\n\n@mention",
             tags=["some:tag"], alert_type="error")
 
-    @mock.patch("datadog_logger.handler.datadog", autospec=True)
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
     def test_log_error_registers_error_reporter_with_configuration_on_logger(
         self,
-        mock_dd: mock.Mock
+        mock_event_class: mock.Mock
     ) -> None:
         some_logger = logging.getLogger("some.logger")
         other_logger = logging.getLogger("other.logger")
@@ -195,6 +193,6 @@ class TestDatadogLogger(TestCase):
 
         other_logger.error("Should not be logged")
 
-        mock_dd.api.Event.create.assert_called_once_with(
+        mock_event_class.create.assert_called_once_with(
             title="Should be logged", text="Should be logged\n\n@mention",
             tags=["some:tag"], alert_type="error")
