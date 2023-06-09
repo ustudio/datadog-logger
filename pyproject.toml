@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datadog-logger"
-version = "0.3.0"
+version = "1.0.0"
 description = "Python logging handler for DataDog events"
 authors = ["uStudio Developers <dev@ustudio.com>"]
 license = "MIT"
