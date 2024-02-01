@@ -26,20 +26,24 @@ class DatadogLogHandler(logging.Handler):
         self.mentions = mentions
 
     def emit(self, record: logging.LogRecord) -> None:
-        text = self.format(record)
+        try:
+            text = self.format(record)
 
-        if self.mentions is not None:
-            text = "\n\n".join([text, " ".join(self.mentions)])
+            if self.mentions is not None:
+                text = "\n\n".join([text, " ".join(self.mentions)])
 
-        create_args: dict[str, object] = {
-            "title": record.getMessage(),
-            "text": text
-        }
+            create_args: dict[str, object] = {
+                "title": record.getMessage(),
+                "text": text
+            }
 
-        if self.tags is not None:
-            create_args["tags"] = self.tags
+            if self.tags is not None:
+                create_args["tags"] = self.tags
 
-        if record.levelno in LOG_LEVEL_ALERT_TYPE_MAPPINGS:
-            create_args["alert_type"] = LOG_LEVEL_ALERT_TYPE_MAPPINGS[record.levelno]
+            if record.levelno in LOG_LEVEL_ALERT_TYPE_MAPPINGS:
+                create_args["alert_type"] = LOG_LEVEL_ALERT_TYPE_MAPPINGS[record.levelno]
 
-        Event.create(**create_args)  # type: ignore[no-untyped-call]
+            Event.create(**create_args)  # type: ignore[no-untyped-call]
+
+        except Exception:
+            self.handleError(record)
