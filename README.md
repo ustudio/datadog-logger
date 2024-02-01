@@ -1,7 +1,11 @@
 # DataDog Logger #
 
-A Python `logging.Handler` for sending log messages to DataDog as
-Events
+Note: This library does not send logs to Datadog's Log Management product. See
+Datadog's documentation for how to configure log collection. See
+https://docs.datadoghq.com/logs/log_collection/
+
+A Python `logging.Handler` for sending log messages to DataDog as Events in
+the Events Explorer.
 
 ## Installation ##
 
