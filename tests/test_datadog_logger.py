@@ -196,3 +196,22 @@ class TestDatadogLogger(TestCase):
         mock_event_class.create.assert_called_once_with(
             title="Should be logged", text="Should be logged\n\n@mention",
             tags=["some:tag"], alert_type="error")
+
+    @mock.patch("logging.Handler.handleError", autospec=True)
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_emit_calls_handle_error_when_it_raises_an_exception(
+        self,
+        mock_event_class: mock.Mock,
+        mock_handle_error: mock.Mock
+    ) -> None:
+        mock_event_class.create.side_effect = Exception("event create error")
+
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message"
+        })
+
+        handler.emit(record)
+
+        mock_handle_error.assert_called_once_with(handler, record)
