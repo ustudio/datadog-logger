@@ -61,13 +61,15 @@ jobs:
 
   publish:
     docker:
-      - image: cimg/python:3.11
+      - image: cimg/python:3.14
     steps:
       - checkout
 
       - run:
           name: Publish to PyPI
           command: |
+            poetry self update --no-ansi -- << pipeline.parameters.poetry_version >>
+
             export POETRY_HTTP_BASIC_PYPI_USERNAME=$PYPI_USERNAME
             export POETRY_HTTP_BASIC_PYPI_PASSWORD=$PYPI_PASSWORD
 
