@@ -43,7 +43,7 @@ class DatadogLogHandler(logging.Handler):
             if record.levelno in LOG_LEVEL_ALERT_TYPE_MAPPINGS:
                 create_args["alert_type"] = LOG_LEVEL_ALERT_TYPE_MAPPINGS[record.levelno]
 
-            Event.create(**create_args)  # type: ignore[no-untyped-call]
+            Event.create(**create_args)  # type: ignore[arg-type]
 
         except Exception:
             self.handleError(record)
