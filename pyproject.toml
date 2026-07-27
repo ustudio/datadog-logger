@@ -17,8 +17,8 @@ datadog = ">=0.45.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.1.1"
-flake8 = "^6.0.0"
-mypy = "^1.3.0"
+flake8 = "^7.3.0"
+mypy = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core"]
