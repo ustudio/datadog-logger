@@ -1,6 +1,6 @@
 [project]
 name = "datadog-logger"
-version = "1.0.2"
+version = "1.0.3"
 description = "Python logging handler for DataDog events"
 authors = [{name = "uStudio Developers", email = "dev@ustudio.com"}]
 license = "MIT"
