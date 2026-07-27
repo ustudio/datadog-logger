@@ -13,7 +13,7 @@ requires-poetry = ">=2.4.1"
 packages = [{include = "datadog_logger"}]
 
 [tool.poetry.dependencies]
-datadog = ">=0.45.0"
+datadog = ">=0.52.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.1.1"
