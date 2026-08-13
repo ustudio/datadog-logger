@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from datadog.api.events import Event
+from datadog.api.exceptions import ApiError
 import logging
 from typing import Any, Optional
 
@@ -43,7 +44,14 @@ class DatadogLogHandler(logging.Handler):
             if record.levelno in LOG_LEVEL_ALERT_TYPE_MAPPINGS:
                 create_args["alert_type"] = LOG_LEVEL_ALERT_TYPE_MAPPINGS[record.levelno]
 
-            Event.create(**create_args)  # type: ignore[arg-type]
+            response = Event.create(**create_args)  # type: ignore[arg-type]
+
+            # The datadog client is muted by default, which means it logs
+            # errors returned by the API and returns them to the caller
+            # instead of raising them, so failures to submit the event have
+            # to be detected here to be reported by handleError
+            if isinstance(response, dict) and response.get("errors"):
+                raise ApiError(response)
 
         except Exception:
             self.handleError(record)

@@ -215,3 +215,65 @@ class TestDatadogLogger(TestCase):
         handler.emit(record)
 
         mock_handle_error.assert_called_once_with(handler, record)
+
+    @mock.patch("logging.Handler.handleError", autospec=True)
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_emit_calls_handle_error_when_response_contains_errors(
+        self,
+        mock_event_class: mock.Mock,
+        mock_handle_error: mock.Mock
+    ) -> None:
+        # The datadog client is muted by default, so it returns errors
+        # reported by the API instead of raising them
+        mock_event_class.create.return_value = {"errors": ["Forbidden"]}
+
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message"
+        })
+
+        handler.emit(record)
+
+        mock_handle_error.assert_called_once_with(handler, record)
+
+    @mock.patch("logging.Handler.handleError", autospec=True)
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_emit_does_not_call_handle_error_when_event_is_created(
+        self,
+        mock_event_class: mock.Mock,
+        mock_handle_error: mock.Mock
+    ) -> None:
+        mock_event_class.create.return_value = {
+            "status": "ok",
+            "event": {"id": 1234, "title": "Some message"}
+        }
+
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message"
+        })
+
+        handler.emit(record)
+
+        mock_handle_error.assert_not_called()
+
+    @mock.patch("logging.Handler.handleError", autospec=True)
+    @mock.patch("datadog_logger.handler.Event", autospec=True)
+    def test_emit_does_not_call_handle_error_when_response_has_no_errors(
+        self,
+        mock_event_class: mock.Mock,
+        mock_handle_error: mock.Mock
+    ) -> None:
+        mock_event_class.create.return_value = {"errors": []}
+
+        handler = DatadogLogHandler()
+
+        record = logging.makeLogRecord({
+            "msg": "Some message"
+        })
+
+        handler.emit(record)
+
+        mock_handle_error.assert_not_called()
