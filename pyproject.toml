@@ -5,11 +5,11 @@ description = "Python logging handler for DataDog events"
 authors = [{name = "uStudio Developers", email = "dev@ustudio.com"}]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["dependencies"]
 
 [tool.poetry]
-requires-poetry = ">=2.4.1"
+requires-poetry = ">=2.5.1"
 packages = [{include = "datadog_logger"}]
 
 [tool.poetry.dependencies]
