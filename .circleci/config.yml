@@ -60,8 +60,11 @@ jobs:
           prefix: python-<< parameters.python_version >>
 
   publish:
+    parameters:
+      python_version:
+        type: string
     docker:
-      - image: cimg/python:3.14
+      - image: cimg/python:<< parameters.python_version >>
     steps:
       - checkout
 
@@ -80,35 +83,15 @@ workflows:
   test-and-publish:
     jobs:
       - test:
-          name: test-3.11
-          python_version: "3.11"
-          filters:
-            tags:
-              only: /.*/
-      - test:
-          name: test-3.12
-          python_version: "3.12"
-          filters:
-            tags:
-              only: /.*/
-      - test:
-          name: test-3.13
-          python_version: "3.13"
-          filters:
-            tags:
-              only: /.*/
-      - test:
-          name: test-3.14
-          python_version: "3.14"
-          filters:
+          matrix:
+            parameters:
+              python_version: ["3.11", "3.12", "3.13", "3.14", "3.15"]
             tags:
               only: /.*/
       - publish:
+          python_version: "3.15"
           requires:
-            - test-3.11
-            - test-3.12
-            - test-3.13
-            - test-3.14
+            - test
           filters:
             tags:
               only: /^v[0-9]+(\.[0-9]+)*.*/
