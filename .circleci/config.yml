@@ -80,12 +80,6 @@ workflows:
   test-and-publish:
     jobs:
       - test:
-          name: test-3.10
-          python_version: "3.10"
-          filters:
-            tags:
-              only: /.*/
-      - test:
           name: test-3.11
           python_version: "3.11"
           filters:
@@ -111,7 +105,6 @@ workflows:
               only: /.*/
       - publish:
           requires:
-            - test-3.10
             - test-3.11
             - test-3.12
             - test-3.13

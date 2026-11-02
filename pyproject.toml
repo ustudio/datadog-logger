@@ -5,7 +5,7 @@ description = "Python logging handler for DataDog events"
 authors = [{name = "uStudio Developers", email = "dev@ustudio.com"}]
 license = "MIT"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["dependencies"]
 
 [tool.poetry]
